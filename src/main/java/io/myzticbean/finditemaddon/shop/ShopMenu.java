@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -104,6 +105,10 @@ public class ShopMenu {
 
         public static Category create(String display, List<String> lore, Material displayType, int slot, Material... materials) {
             Component displayComponent = deserialize(display);
+            final List<GuiItem> materialButtons = Arrays.asList(materials).stream().map(material -> ItemBuilder.from(material).name(text(WordUtils.capitalizeFully(material.name().toLowerCase().replaceAll("_", " ")), NamedTextColor.GREEN)).lore(text("Click to view shops...", NamedTextColor.GRAY)).asGuiItem(event -> {
+                event.getWhoClicked().closeInventory();
+                new ShopModeGui(material).open(event.getWhoClicked());
+            })).toList();
 
             return new Category(
                     ItemBuilder.from(displayType)
@@ -133,12 +138,7 @@ public class ShopMenu {
                                 .lore(config.getStringList("shop-gui.category-gui.buttons.scroll-down.lore").stream().map(ShopMenu::deserialize).toList())
                                 .asGuiItem(event -> gui.next()));
 
-                        for (Material material : materials) {
-                            gui.addItem(ItemBuilder.from(material).name(text(WordUtils.capitalizeFully(material.name().toLowerCase().replaceAll("_", " ")), NamedTextColor.GREEN)).lore(text("Click to view shops...", NamedTextColor.GRAY)).asGuiItem(event -> {
-                                event.getWhoClicked().closeInventory();
-                                new ShopModeGui(material).open(event.getWhoClicked());
-                            }));
-                        }
+                        gui.addItem(materialButtons.toArray(new GuiItem[0]));
 
                         gui.open(player);
                     }
