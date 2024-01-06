@@ -45,6 +45,12 @@ public class ConfigSetup {
     }
 
     public static void checkForMissingProperties() {
+        if (!configFileConfiguration.contains("shop-gui")) {
+            final String prefix = "shop-gui.";
+            configFileConfiguration.set(prefix + "enabled", false);
+            configFileConfiguration.set(prefix + "aliases", List.of("shop", "shops"));
+        }
+
         if(!configFileConfiguration.contains("search-loaded-shops-only", true)) {
             configFileConfiguration.set("search-loaded-shops-only", false);
         }
